@@ -56,11 +56,14 @@ const alt = useKeyModifier("Alt"); // clone tasks with alt key when you drag and
                         item-key="id" 
                         >
                         <template #item="{ element: task }: { element: Task }">
-                            <TrelloBoardTask :task="task"/>
+                            <div>
+                                <TrelloBoardTask :task="task"/>
+                            </div>
+                            
                         </template>
                     </draggable>
                     <footer>
-                        <button class="text-gray-500">+ Add a Card</button>
+                        <NewTask @add="column.tasks.push($event)" />
                     </footer>
                 </div>
             </template>
