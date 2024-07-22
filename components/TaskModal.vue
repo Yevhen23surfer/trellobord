@@ -1,19 +1,21 @@
 <template>
   <div v-if="showModal" class="modal-overlay"> 
     <div class="modal-content"> 
-      <div class="flex justify-end mt-4 mb-4">
+      <div class="flex mt-2 mb-4">
+        <input type="text" v-model="task.title" class="w-full mr-2 px-4 py-2 border rounded-md" />
         <button @click="closeModal" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"> 
           X 
-      </button>
+        </button>
       </div>
-      <input type="text" v-model="task.title" class="w-full mb-4 px-4 py-2 border rounded-md" />
+      
       <textarea v-model="task.description" class="w-full mb-4 px-4 py-2 border rounded-md" placeholder="Task Description"></textarea>
       <h3>Subtasks</h3>
       <ul>
-        <li v-for="subtask in task.subtasks" :key="subtask.id">
-          {{ subtask.text }} 
+        <li v-for="subtask in task.subtasks" :key="subtask.id" class="flex justify-between items-center"> 
+          <input type="checkbox" v-model="subtask.completed" @change="toggleComplete(subtask)"> 
+          <span :class="{ 'line-through text-gray-500': subtask.completed }">{{ subtask.text }}</span>
           
-          <button @click="editSubtask(subtask); console.log('Editing:', subtask.isEditing)" class="mr-2"> 
+          <button @click="subtask.isEditing = !subtask.isEditing" class="mr-2"> 
             ✏️
           </button>
           <button @click="deleteSubtask(subtask)">🗑️</button>
@@ -32,6 +34,9 @@
         </button>
       </div>
       <div class="flex justify-end mt-4"> 
+        <button @click="handleDelete" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 mr-2"> 
+          Delete
+        </button>
         <button @click="saveChanges" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">
           Save Changes
         </button>
@@ -41,19 +46,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, defineEmits } from 'vue';
-import type { Task, Subtask } from '@/types';
+import { ref, defineEmits  } from 'vue';
+import { defineProps } from '@vue/runtime-core';
+import type { Task, Subtask, ID } from '@/types';
 import { nanoid } from 'nanoid';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faPencilAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
+
 const props = defineProps<{
-  task: Task | null,
-  showModal: boolean
+    task: Task | null;
+    showModal: boolean;
 }>();
 
 const emit = defineEmits<{
   (e: 'close'): void,
-  (e: 'save', updatedTask: Task): void
+  (e: 'save', updatedTask: Task): void,
+  (e: 'delete', taskId: ID): void
 }>();
 
 const task = ref({...props.task, subtasks: props.task?.subtasks || [] });
@@ -73,6 +81,11 @@ const editSubtask = (subtask: Subtask) => {
   subtask.isEditing = !subtask.isEditing; 
   console.log('Toggled isEditing to:', subtask.isEditing);
 };
+
+const toggleComplete = (subtask: Subtask) => {
+    subtask.completed = !subtask.completed;
+};
+
 const deleteSubtask = (subtask: Subtask) => {
   task.value.subtasks = task.value.subtasks.filter(s => s.id !== subtask.id);
 }
@@ -88,6 +101,14 @@ const saveChanges = () => {
 const closeModal = () => {
   emit('close');
 }
+
+const handleDelete = () => {
+  if (props.task && confirm('Are you sure you want to delete this task?')) {
+    emit('delete', props.task.id); 
+    closeModal(); 
+  }
+};
+
 </script>
 
 <style>

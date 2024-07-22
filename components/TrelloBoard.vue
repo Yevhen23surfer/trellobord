@@ -3,6 +3,8 @@
 import type { Column, Task, ID } from '~~/types';
 import { ref } from 'vue';
 import { nanoid } from "nanoid";
+import TrelloBoardTask from './TrelloBoardTask.vue';
+import NewTask from './NewTask.vue';
 import draggable from 'vuedraggable';
 import TaskModal from './TaskModal.vue'; 
 
@@ -150,12 +152,12 @@ const deleteTask = (taskId: ID) => {
       + Add Another Column
     </button>
     <TaskModal 
-      v-if="showModal" 
-      :task="selectedTask" 
-      :showModal="showModal" 
-      @close="showModal = false" 
-      @save="updateTask" 
-    />
+    v-if="showModal" 
+    :task="selectedTask" 
+    :showModal="showModal" 
+    @close="showModal = false" 
+    @save="updateTask" 
+    @delete="deleteTask"  />
     </div>
 
 </template>

@@ -48,6 +48,7 @@ const handleDelete = () => {
         {{ task.title }}
       </span>
     </div>
+    <!-- <button @click.stop="handleDelete">Delete</button> -->
   </template>
 
 <style>
