@@ -129,8 +129,7 @@ const deleteTask = (taskId: ID) => {
                         <template #item="{ element: task }: { element: Task }">
                             <div>
                               <TrelloBoardTask 
-                                v-for="task in column.tasks" 
-                                :key="task.id" 
+                                
                                 :task="task" 
                                 @delete="deleteTask" 
                                 @openModal="openTaskModal"  />

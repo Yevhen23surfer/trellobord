@@ -1,17 +1,22 @@
 <template>
   <div v-if="showModal" class="modal-overlay"> 
     <div class="modal-content"> 
-      <button @click="closeModal" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 bg-transparent"> 
-        X 
+      <div class="flex justify-end mt-4 mb-4">
+        <button @click="closeModal" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"> 
+          X 
       </button>
+      </div>
       <input type="text" v-model="task.title" class="w-full mb-4 px-4 py-2 border rounded-md" />
       <textarea v-model="task.description" class="w-full mb-4 px-4 py-2 border rounded-md" placeholder="Task Description"></textarea>
       <h3>Subtasks</h3>
       <ul>
         <li v-for="subtask in task.subtasks" :key="subtask.id">
           {{ subtask.text }} 
-          <button @click="editSubtask(subtask)">Edit</button>
-          <button @click="deleteSubtask(subtask)">Delete</button>
+          
+          <button @click="editSubtask(subtask); console.log('Editing:', subtask.isEditing)" class="mr-2"> 
+            ✏️
+          </button>
+          <button @click="deleteSubtask(subtask)">🗑️</button>
         </li>
       </ul>
       <div class="flex mt-2"> 
@@ -20,14 +25,17 @@
           v-model="newSubtaskText" 
           class="w-full mr-2 px-4 py-2 border rounded-md" 
           placeholder="Add a new subtask"
+          @keyup.enter="addNewSubtask"
         />
         <button @click="addNewSubtask" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
           Add
         </button>
       </div>
-      <button @click="saveChanges" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 mt-4">
-        Save Changes
-      </button>
+      <div class="flex justify-end mt-4"> 
+        <button @click="saveChanges" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">
+          Save Changes
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -36,6 +44,8 @@
 import { ref, defineProps, defineEmits } from 'vue';
 import type { Task, Subtask } from '@/types';
 import { nanoid } from 'nanoid';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faPencilAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 const props = defineProps<{
   task: Task | null,
   showModal: boolean
@@ -48,20 +58,21 @@ const emit = defineEmits<{
 
 const task = ref({...props.task, subtasks: props.task?.subtasks || [] });
 const addNewSubtask = () => {
-  if (task.value.subtasks) { // Check if subtasks exists
+  if (newSubtaskText.value.trim() !== '') { 
     task.value.subtasks.push({ 
       id: nanoid(), 
       text: newSubtaskText.value, 
-      completed: false 
+      completed: false,
+      isEditing: false // Add isEditing property
     });
     newSubtaskText.value = ''; // Clear the input field after adding a subtask
   }
 }
 const newSubtaskText = ref('');
 const editSubtask = (subtask: Subtask) => {
-  // Implement subtask editing logic here (e.g., open an edit field)
-  console.log('Editing subtask:', subtask);
-}
+  subtask.isEditing = !subtask.isEditing; 
+  console.log('Toggled isEditing to:', subtask.isEditing);
+};
 const deleteSubtask = (subtask: Subtask) => {
   task.value.subtasks = task.value.subtasks.filter(s => s.id !== subtask.id);
 }

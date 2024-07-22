@@ -18,4 +18,5 @@ export interface Subtask {
     id: ID;
     text: string;
     completed: boolean; 
+    isEditing: boolean; 
 }

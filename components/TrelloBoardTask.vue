@@ -17,7 +17,6 @@ const emit = defineEmits<{
 
 
 const openModal = () => {
-  console.log('openModal event emitted with task:', props.task); 
   emit('openModal', props.task); // Emit the task data
 }
 
