@@ -1,9 +1,10 @@
 <script setup lang="ts">
 
-import type { Column, Task } from '~~/types';
+import type { Column, Task, ID } from '~~/types';
 import { ref } from 'vue';
 import { nanoid } from "nanoid";
 import draggable from 'vuedraggable';
+import TaskModal from './TaskModal.vue'; 
 
 const columns = ref<Column[]>([
     {
@@ -11,13 +12,13 @@ const columns = ref<Column[]>([
         title: "Backlog",
         tasks: [
             {
-                title: "Create marketing landing page", createdAt: new Date(), id: nanoid(),
+                title: "Create marketing landing page", createdAt: new Date(), id: nanoid(), subtasks: []
             },
             {
-                title: "Develop cool new feature", createdAt: new Date(), id: nanoid(),
+                title: "Develop cool new feature", createdAt: new Date(), id: nanoid(), subtasks: []
             },
             {
-                title: "Research new startup", createdAt: new Date(), id: nanoid(),
+                title: "Research new startup", createdAt: new Date(), id: nanoid(), subtasks: []
             },
         ],
 
@@ -46,6 +47,51 @@ function createColumn() {
     ).focus();
   });
 }
+
+const showModal = ref(false);
+const selectedTask = ref<Task>({
+  id: '',
+  title: '',
+  createdAt: new Date(),
+  description: '',
+  subtasks: []
+}); 
+
+const openTaskModal = (task: Task) => {
+  console.log('openTaskModal called with task:', task);
+  selectedTask.value = task;
+  showModal.value = true;
+}
+
+const updateTask = (updatedTask: Task) => {
+  // Find the column that contains the task
+  const columnIndex = columns.value.findIndex(column => 
+    column.tasks.some(task => task.id === updatedTask.id)
+  );
+  if (columnIndex !== -1) {
+    // Find the task within the column
+    const taskIndex = columns.value[columnIndex].tasks.findIndex(task => 
+      task.id === updatedTask.id
+    );
+    if (taskIndex !== -1) {
+      // Update the task
+      columns.value[columnIndex].tasks[taskIndex] = updatedTask;
+    }
+  }
+  showModal.value = false; // Close the modal after updating
+}
+
+const deleteTask = (taskId: ID) => {
+  // Find the column that contains the task
+  const columnIndex = columns.value.findIndex(column => 
+    column.tasks.some(task => task.id === taskId)
+  );
+  if (columnIndex !== -1) {
+    // Remove the task from the column
+    columns.value[columnIndex].tasks = columns.value[columnIndex].tasks.filter(task => task.id !== taskId);
+  }
+}
+
 
 </script>
 
@@ -82,8 +128,12 @@ function createColumn() {
                         >
                         <template #item="{ element: task }: { element: Task }">
                             <div>
-                                <TrelloBoardTask :task="task"
-                                @delete="column.tasks = column.tasks.filter(t => t.id !== $event)"/>
+                              <TrelloBoardTask 
+                                v-for="task in column.tasks" 
+                                :key="task.id" 
+                                :task="task" 
+                                @delete="deleteTask" 
+                                @openModal="openTaskModal"  />
                             </div>
                             
                         </template>
@@ -100,7 +150,13 @@ function createColumn() {
     >
       + Add Another Column
     </button>
-
+    <TaskModal 
+      v-if="showModal" 
+      :task="selectedTask" 
+      :showModal="showModal" 
+      @close="showModal = false" 
+      @save="updateTask" 
+    />
     </div>
 
 </template>

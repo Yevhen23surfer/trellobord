@@ -1,6 +1,8 @@
 <script setup lang="ts">
 
 import type {Task, ID} from "@/types";
+import { defineEmits } from 'vue';
+
 
 
 const props = defineProps<{
@@ -8,29 +10,46 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: "delete", payload: ID) : void;
+  (e: "delete", payload: ID) : void;
+  (e: "openModal", task: Task): void; // Add new event
 }>();
+
+
+
+const openModal = () => {
+  console.log('openModal event emitted with task:', props.task); 
+  emit('openModal', props.task); // Emit the task data
+}
 
 const focused = ref(false);
 onKeyStroke("Backspace", (e)=>{
     if(focused.value) emit("delete", props.task.id)
 })
+
+const handleDelete = () => {
+  if (confirm('Are you sure you want to delete this task?')) { 
+    emit("delete", props.task.id); 
+  }
+}
+
+
 </script>
 
 <template>
-    <div
-        :title="task.createdAt.toLocaleDateString()"
-        class="task bg-white p-2 mb-2 rounded shadow-sm max-w-[250px] flex"
-        @focus="focused = true"
-        @blur="focused = false"
-        tabindex="0"
+    <div 
+      :title="task.createdAt.toLocaleDateString()"
+      class="task bg-white p-2 mb-2 rounded shadow-sm max-w-[250px] flex"
+      @focus="focused = true"
+      @blur="focused = false"
+      tabindex="0"
+      @click="openModal"
     >
-        <DragHandle class="pr-2"/>
-        <span>
-            {{ task.title }}
-        </span>
+      <DragHandle class="pr-2"/>
+      <span>
+        {{ task.title }}
+      </span>
     </div>
-</template>
+  </template>
 
 <style>
 
