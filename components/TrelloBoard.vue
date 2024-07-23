@@ -151,7 +151,13 @@ const deleteTask = (taskId: ID) => {
     >
       + Add Another Column
     </button>
-    <Transition :duration="550" name="nested">
+
+    <Transition
+    enter-active-class="transition-opacity duration-300 ease-in-out"
+    leave-active-class="transition-opacity duration-300 delay-250"
+    enter-from-class="opacity-0"
+    leave-to-class="opacity-0"
+    >
     <TaskModal 
     v-if="showModal" 
     :task="selectedTask" 
@@ -164,19 +170,3 @@ const deleteTask = (taskId: ID) => {
 
 </template>
 
-<style>
-.nested-enter-active, .nested-leave-active {
-	transition: all 0.3s ease-in-out;
-}
-/* delay leave of parent element */
-.nested-leave-active {
-  transition-delay: 0.25s;
-}
-
-.nested-enter-from,
-.nested-leave-to {
-  transform: translateY(30px);
-  opacity: 0;
-}
-
-</style>
