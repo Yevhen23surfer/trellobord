@@ -1,5 +1,5 @@
 <template>
-  <div v-if="showModal" class="modal-overlay"> 
+  <div v-if="showModal" class="modal-overlay" @click="handleOverlayClick"> 
     <div class="modal-content"> 
       <div class="flex mt-2 mb-4">
         <input type="text" v-model="task.title" class="w-full mr-2 px-4 py-2 border rounded-md" />
@@ -11,14 +11,15 @@
       <textarea v-model="task.description" class="w-full mb-4 px-4 py-2 border rounded-md" placeholder="Task Description"></textarea>
       <h3>Subtasks</h3>
       <ul>
-        <li v-for="subtask in task.subtasks" :key="subtask.id" class="flex justify-between items-center"> 
-          <input type="checkbox" v-model="subtask.completed" @change="toggleComplete(subtask)"> 
-          <span :class="{ 'line-through text-gray-500': subtask.completed }">{{ subtask.text }}</span>
-          
-          <button @click="subtask.isEditing = !subtask.isEditing" class="mr-2"> 
-            ✏️
-          </button>
-          <button @click="deleteSubtask(subtask)">🗑️</button>
+        <li v-for="subtask in task.subtasks" :key="subtask.id" class="flex items-center mb-2"> 
+          <input type="checkbox" v-model="subtask.completed" @change="toggleComplete(subtask)" class="w-6 h-6 mr-4"> 
+          <span :class="{ 'line-through text-gray-500': subtask.completed }" class="flex-grow">{{ subtask.text }}</span>
+          <div>
+            <button @click="subtask.isEditing = !subtask.isEditing" class="mr-2"> 
+              ✏️
+            </button>
+            <button @click="deleteSubtask(subtask)">🗑️</button>
+          </div>
         </li>
       </ul>
       <div class="flex mt-2"> 
@@ -101,6 +102,14 @@ const saveChanges = () => {
 const closeModal = () => {
   emit('close');
 }
+
+// Close the modal when the overlay is clicked
+const handleOverlayClick = (event: MouseEvent) => {
+  // Check if the click was on the overlay and not on the modal content
+  if (event.target === event.currentTarget) {
+    emit('close'); // Emit the close event
+  }
+};
 
 const handleDelete = () => {
   if (props.task && confirm('Are you sure you want to delete this task?')) {
