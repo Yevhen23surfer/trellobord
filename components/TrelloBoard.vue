@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import type { Column, Task, ID } from '~~/types';
 import { ref } from 'vue';
 import { nanoid } from "nanoid";
@@ -158,15 +157,14 @@ const deleteTask = (taskId: ID) => {
     enter-from-class="opacity-0"
     leave-to-class="opacity-0"
     >
-    <TaskModal 
-    v-if="showModal" 
-    :task="selectedTask" 
-    :showModal="showModal" 
-    @close="showModal = false" 
-    @save="updateTask" 
-    @delete="deleteTask"  />
-  </Transition>
-    </div>
-
+        <TaskModal 
+        v-if="showModal" 
+        :task="selectedTask" 
+        :showModal="showModal" 
+        @close="showModal = false" 
+        @save="updateTask" 
+        @delete="deleteTask"  />
+    </Transition>
+  </div>
 </template>
 
