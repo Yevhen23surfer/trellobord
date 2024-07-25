@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { db } from '~/plugins/firebase.js';
-import { collection, getDocs, addDoc, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import type { Column, Task, ID } from '~~/types';
 import { ref } from 'vue';
 import { nanoid } from "nanoid";
@@ -59,21 +57,6 @@ const selectedTask = ref<Task>({
   description: '',
   subtasks: []
 }); 
-
-const tasks = ref<Task[]>([]);
-const tasksCollection = collection(db, 'tasks');
-
-   const fetchTasks = async () => {
-     const querySnapshot = await getDocs(tasksCollection);
-     tasks.value = querySnapshot.docs.map(doc => ({
-  id: doc.id,
-  title: doc.data().title || '', // Provide default values if needed
-  createdAt: doc.data().createdAt ? new Date(doc.data().createdAt.seconds * 1000) : new Date(),
-  description: doc.data().description,
-  subtasks: doc.data().subtasks || []
-}));
-   };
-   fetchTasks(); // Call the function to fetch tasks when the component mounts
 
 const openTaskModal = (task: Task) => {
   console.log('openTaskModal called with task:', task);
@@ -182,12 +165,6 @@ const deleteTask = (taskId: ID) => {
         @save="updateTask" 
         @delete="deleteTask"  />
     </Transition>
-    <ul>
-    <li v-for="task in tasks" :key="task.id">
-      {{ task.title }}
-    </li>
-  </ul>
-    </div>
-
+  </div>
 </template>
 
